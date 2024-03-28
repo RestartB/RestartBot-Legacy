@@ -428,7 +428,7 @@ async def on_message(message):
                                     self.page = len(self.pages) - 1
                                 embed = discord.Embed(title = f"{result_info['name']} (Playlist)", description = f"by {result_info['owner']['display_name']} - {result_info['tracks']['total']} items\n\n{self.pages[self.page]}", color = Color.random())
                                 embed.set_thumbnail(url = result_info['images'][0]['url'])
-                                embed.set_footer(text = f"Requested by {interaction.user.name} - Page {self.page + 1}/{len(pages)}")
+                                embed.set_footer(text = f"Requested by {interaction.user.name} - Page {self.page + 1}/{len(pages)}", icon_url = message.author.avatar.url)
                                 await msg.edit(embed = embed)
 
                             # Next page button
@@ -441,7 +441,7 @@ async def on_message(message):
                                     self.page = 0
                                 embed = discord.Embed(title = f"{result_info['name']} (Playlist)", description = f"by {result_info['owner']['display_name']} - {result_info['tracks']['total']} items\n\n{self.pages[self.page]}", color = Color.random())
                                 embed.set_thumbnail(url = result_info['images'][0]['url'])
-                                embed.set_footer(text = f"Message by {message.author.name} - Page {self.page + 1}/{len(pages)}")
+                                embed.set_footer(text = f"Message by {message.author.name} - Page {self.page + 1}/{len(pages)}", icon_url = message.author.avatar.url)
                                 await msg.edit(embed = embed)
 
                         # Create embed, populate it with information
@@ -539,7 +539,7 @@ async def self(interaction: discord.Interaction):
         async with session.get("https://api.thecatapi.com/v1/images/search") as request:
             request_data = await request.json()
             embed_title = random.choice(cat_titles)
-            embed = discord.Embed(title = embed_title)
+            embed = discord.Embed(title = embed_title, color = Color.random())
             embed.set_image(url = request_data[0]["url"])
             embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
             await interaction.followup.send(embed = embed)
@@ -553,7 +553,7 @@ async def self(interaction: discord.Interaction):
         async with session.get("https://dog.ceo/api/breeds/image/random") as request:
             request_data = await request.json()
             embed_title = random.choice(dog_titles)
-            embed = discord.Embed(title = embed_title)
+            embed = discord.Embed(title = embed_title, color = Color.random())
             embed.set_image(url = request_data["message"])
             embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
             await interaction.followup.send(embed = embed)
@@ -593,7 +593,7 @@ async def self(interaction: discord.Interaction, search: str):
         # Send request to LRCLib
         async with aiohttp.ClientSession() as session:
             async with session.get(request_url) as request:
-                request_data = request.json()
+                request_data = await request.json()
         
         # Check if result is blank
         if request_data == []:

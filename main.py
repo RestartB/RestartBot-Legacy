@@ -1321,6 +1321,8 @@ async def self(interaction: discord.Interaction, query: str):
     embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
     await interaction.followup.send(embed = embed)
 
+    embed_list = []
+
     try:
         query = query.replace(" ", "%20")
         request = requests.get(f"https://api.urbandictionary.com/v0/define?term={query}")
@@ -1340,34 +1342,39 @@ async def self(interaction: discord.Interaction, query: str):
             
                 @discord.ui.button(label="<", style=ButtonStyle.green, custom_id="prev")
                 async def prev_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+                    embed_list.pop()
                     if self.page > 0:
                         self.page -= 1
                     else:
                         self.page = len(self.pages) - 1
                     embed = discord.Embed(title = f"{self.pages[self.page]['word']}", description = f"**Author: {self.pages[self.page]['author']}**\n\n||{(self.pages[self.page]['definition'].replace('[', '')).replace(']', '')}||", color = Color.random())
                     embed.set_footer(text = f"Requested by {interaction.user.name} - Page {self.page + 1}/{len(item_list)}", icon_url = interaction.user.avatar.url)
-                    await interaction.response.edit_message(embed = embed)
+                    embed_list.append(embed)
+                    await interaction.response.edit_message(embeds = embed_list)
 
                 @discord.ui.button(label=">", style=ButtonStyle.green, custom_id="next")
                 async def next_button(self, interaction: discord.Interaction, button: discord.ui.Button):
+                    embed_list.pop()
                     if self.page < len(self.pages) - 1:
                         self.page += 1
                     else:
                         self.page = 0
                     embed = discord.Embed(title = f"{self.pages[self.page]['word']}", description = f"**Author: {self.pages[self.page]['author']}**\n\n||{(self.pages[self.page]['definition'].replace('[', '')).replace(']', '')}||", color = Color.random())
                     embed.set_footer(text = f"Requested by {interaction.user.name} - Page {self.page + 1}/{len(item_list)}")
-                    await interaction.response.edit_message(embed = embed)
+                    embed_list.append(embed)
+                    await interaction.response.edit_message(embeds = embed_list)
 
+            embed = discord.Embed(title = "Content Warning", description = "Urban Dictionary has very little moderation and content may be inappropriate! View at your own risk.", color = Color.orange())
+            embed_list.append(embed)
+            
             embed = discord.Embed(title = f"{item_list[0]['word']}", description = f"**Author: {item_list[0]['author']}**\n\n||{(item_list[0]['definition'].replace('[', '')).replace(']', '')}||", color = Color.random())
             embed.set_footer(text = f"Requested by {interaction.user.name} - Page 1/{len(item_list)}", icon_url = interaction.user.avatar.url)
+            embed_list.append(embed)
             
             if len(item_list) == 1:
-                await interaction.edit_original_response(embed = embed)
+                await interaction.edit_original_response(embeds = embed_list)
             else:
-                await interaction.edit_original_response(embed = embed, view = UrbanDictPageView(item_list))
-            
-            embed = discord.Embed(title = "Content Warning", description = "Urban Dictionary has very little moderation and content may be inappropriate! View at your own risk.", color = Color.orange())
-            await interaction.channel.send(embed = embed, view = None)
+                await interaction.edit_original_response(embeds = embed_list, view = UrbanDictPageView(item_list))
         else:
             embed = discord.Embed(title = "No results found.", color = Color.red())
             embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)

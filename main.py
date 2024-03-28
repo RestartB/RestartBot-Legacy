@@ -62,6 +62,9 @@ sp = spotipy.Spotify(auth_manager=auth_manager)
 cat_titles = ["Aww!", "Cute cat!", "Adorable!", "Meow!", "Purrfect!", "Cat!", ":3"]
 dog_titles = ["Aww!", "Cute dog!", "Adorable!", "Woof!", "Woof woof!", "Dog!", "Bark!"]
 
+# 8 Ball Responses
+ball_list=["It is certain.", "It is decidedly so.", "Without a doubt.", "Yes definitely.", "You may rely on it.", "As I see it, yes.","Most likely.","Outlook good.", "Yes.", "Signs point to yes.", "Reply hazy, try again.", "Ask again later.", "Better not tell you now.", "Cannot predict now.", "Concentrate and ask again.", "Don't count on it.", "My reply is no.", "My sources say no.", "Outlook not so good.", "Very doubtful."]
+
 # Restart's User ID
 restart_id = 563372552643149825
 
@@ -1413,6 +1416,31 @@ async def self(interaction: discord.Interaction, search: str):
         await interaction.followup.send(embed = embed, ephemeral = True)
     except GuessedAtParserWarning:
         pass
+
+# 8 Ball command
+@tree.command(name = "8ball", description = "Get an answer from the mystical 8 ball.")
+async def self(interaction: discord.Interaction, question: str):
+    await interaction.response.defer()
+
+    # Truncate question if longer than 1024 characters
+    if len(question) > 1024:
+        question_trunc = question[:1021] + "..."
+    else:
+        question_trunc = question
+
+    embed = discord.Embed(title = "Rolling...", color = Color.random())
+    embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
+
+    await interaction.followup.send(embed = embed)
+
+    await asyncio.sleep(random.randint(2,4))
+
+    embed = discord.Embed(title = "8 Ball", color = Color.random())
+    embed.add_field(name = "Your Question", value = question_trunc, inline = False)
+    embed.add_field(name = "8 Ball's Response", value = random.choice(ball_list))
+    embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
+
+    await interaction.edit_original_response(embed = embed)
 
 # Cooldown Handler
 @tree.error

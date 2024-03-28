@@ -20,7 +20,7 @@ import wikipedia
 from bs4 import GuessedAtParserWarning
 
 # Imports - Cat / Dog
-import requests
+import aiohttp
 
 # Imports - Insult, Compliment
 import random
@@ -71,7 +71,7 @@ class aclient(discord.Client):
         intents = discord.Intents.default()
         intents.message_content = True
         super().__init__(intents=intents)
-        self.synced = False
+        self.synced = True
     
     async def on_ready(self):
         await self.wait_until_ready()
@@ -535,24 +535,28 @@ async def self(interaction: discord.Interaction):
 @app_commands.checks.cooldown(1, 5)
 async def self(interaction: discord.Interaction):
     await interaction.response.defer()
-    response = requests.get("https://api.thecatapi.com/v1/images/search")
-    response.json()
-    embed_title = random.choice(cat_titles)
-    embed = discord.Embed(title = embed_title)
-    embed.set_image(url = response.json()[0]["url"])
-    await interaction.followup.send(embed = embed)
+    async with aiohttp.ClientSession() as session:
+        async with session.get("https://api.thecatapi.com/v1/images/search") as request:
+            request_data = await request.json()
+            embed_title = random.choice(cat_titles)
+            embed = discord.Embed(title = embed_title)
+            embed.set_image(url = request_data[0]["url"])
+            embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
+            await interaction.followup.send(embed = embed)
 
 # Dog command
 @tree.command(name = "dog", description = "Get a random dog picture.")
 @app_commands.checks.cooldown(1, 5)
 async def self(interaction: discord.Interaction):
     await interaction.response.defer()
-    response = requests.get("https://dog.ceo/api/breeds/image/random")
-    response.json()
-    embed_title = random.choice(dog_titles)
-    embed = discord.Embed(title = embed_title)
-    embed.set_image(url = response.json()["message"])
-    await interaction.followup.send(embed = embed)
+    async with aiohttp.ClientSession() as session:
+        async with session.get("https://dog.ceo/api/breeds/image/random") as request:
+            request_data = await request.json()
+            embed_title = random.choice(dog_titles)
+            embed = discord.Embed(title = embed_title)
+            embed.set_image(url = request_data["message"])
+            embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
+            await interaction.followup.send(embed = embed)
 
 # --- SONG COMMANDS ---
 
@@ -587,8 +591,9 @@ async def self(interaction: discord.Interaction, search: str):
         search = search.replace("%20", " ")
 
         # Send request to LRCLib
-        request = requests.get(request_url)
-        request_data = request.json()
+        async with aiohttp.ClientSession() as session:
+            async with session.get(request_url) as request:
+                request_data = request.json()
         
         # Check if result is blank
         if request_data == []:
@@ -1325,8 +1330,9 @@ async def self(interaction: discord.Interaction, query: str):
 
     try:
         query = query.replace(" ", "%20")
-        request = requests.get(f"https://api.urbandictionary.com/v0/define?term={query}")
-        request_data = request.json()
+        async with aiohttp.ClientSession() as session:
+            async with session.get(f"https://api.urbandictionary.com/v0/define?term={query}") as request:
+                request_data = request.json()
 
         item_list = []
 

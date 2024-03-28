@@ -1196,7 +1196,7 @@ async def self(interaction: discord.Interaction, url: str):
                         self.page = len(self.pages) - 1
                     embed = discord.Embed(title = f"{result_info['name']} (Playlist)", description = f"by {result_info['owner']['display_name']} - {result_info['tracks']['total']} items\n\n{self.pages[self.page]}", color = Color.random())
                     embed.set_thumbnail(url = result_info['images'][0]['url'])
-                    embed.set_footer(text = f"Requested by {interaction.user.name} - Page {self.page + 1}/{len(pages)}")
+                    embed.set_footer(text = f"Requested by {interaction.user.name} - Page {self.page + 1}/{len(pages)}", icon_url = interaction.user.avatar.url)
                     await interaction.response.edit_message(embed = embed)
 
                 @discord.ui.button(label=">", style=ButtonStyle.green, custom_id="next")
@@ -1332,7 +1332,7 @@ async def self(interaction: discord.Interaction, query: str):
         query = query.replace(" ", "%20")
         async with aiohttp.ClientSession() as session:
             async with session.get(f"https://api.urbandictionary.com/v0/define?term={query}") as request:
-                request_data = request.json()
+                request_data = await request.json()
 
         item_list = []
 
@@ -1366,7 +1366,7 @@ async def self(interaction: discord.Interaction, query: str):
                     else:
                         self.page = 0
                     embed = discord.Embed(title = f"{self.pages[self.page]['word']}", description = f"**Author: {self.pages[self.page]['author']}**\n\n||{(self.pages[self.page]['definition'].replace('[', '')).replace(']', '')}||", color = Color.random())
-                    embed.set_footer(text = f"Requested by {interaction.user.name} - Page {self.page + 1}/{len(item_list)}")
+                    embed.set_footer(text = f"Requested by {interaction.user.name} - Page {self.page + 1}/{len(item_list)}", icon_url = interaction.user.avatar.url)
                     embed_list.append(embed)
                     await interaction.response.edit_message(embeds = embed_list)
 
@@ -1386,7 +1386,7 @@ async def self(interaction: discord.Interaction, query: str):
             embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
             await interaction.edit_original_response(embed = embed)
     except Exception:
-        embed = discord.Embed(title = "An error has occured.", description = "Please try again later or message <@563372552643149825> for assistance.")
+        embed = discord.Embed(title = "An error has occured.", description = "Please try again later or message <@563372552643149825> for assistance.", color = Color.red())
         embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
         await interaction.edit_original_response(embed = embed, view = None)
 

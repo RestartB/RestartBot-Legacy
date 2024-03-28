@@ -71,7 +71,7 @@ class aclient(discord.Client):
         intents = discord.Intents.default()
         intents.message_content = True
         super().__init__(intents=intents)
-        self.synced = True
+        self.synced = False
     
     async def on_ready(self):
         await self.wait_until_ready()

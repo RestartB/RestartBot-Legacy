@@ -529,8 +529,6 @@ async def self(interaction: discord.Interaction):
     embed.add_field(name = "CPU Name", value = sysinfo['brand_raw'], inline = False)
     embed.add_field(name = "Percent CPU Usage", value = psutil.cpu_percent(), inline = False)
     embed.add_field(name = "Percent RAM Usage", value = psutil.virtual_memory().percent, inline = False)
-    embed.add_field(name = "Percent CPU Usage", value = "Temporarily Disabled", inline = False)
-    embed.add_field(name = "Percent RAM Usage", value = "Temporarily Disabled", inline = False)
     embed.add_field(name = "System Uptime", value = ("%d:%d:%d:%d" % (d.day-1, d.hour, d.minute, d.second)), inline = False)
     embed.add_field(name = "OS Name", value = os.name, inline = False)
     embed.add_field(name = "Python Version", value = sysinfo['python_version'])

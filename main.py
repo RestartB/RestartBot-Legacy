@@ -870,6 +870,7 @@ async def self(interaction: discord.Interaction, search_type: app_commands.Choic
                 # Edit initial message to show dropdown
                 await interaction.edit_original_response(embed = embed, view = view)
         elif search_type.value == "artist":
+            song_list = []
             artist_list = []
             id_list = []
             options = []

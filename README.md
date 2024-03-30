@@ -37,10 +37,10 @@ To use Spotify related commands, a Spotify API Client ID and Secret are required
 - `spotipy` - Spotify commands
 
 ### Pip Install Command
-To install all required packages using Pip, you can run the following command to retrieve the packages from PyPi:
+To install all required packages using Pip, you can run the following command to retrieve the packages from PyPi:\
 `pip install discord.py wikipedia psutil py-cpuinfo spotipy`
 
 ## Adding a New Command
-If you would like to add a new command to your copy of RestartBot, you can use the following template:
+If you would like to add a new command to your copy of RestartBot, you can use the following template:\
 `@tree.command(name = "command-name", description = "Description of your command.")\
 todo

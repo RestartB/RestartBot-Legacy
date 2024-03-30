@@ -5,6 +5,7 @@ Discord Bot by Restart.
 Coming soon!
 
 ## Required Steps
+
 ### Setup
 1. Clone this GitHub repo.
 2. Inside the RestartBot folder, make a folder called "tokens".
@@ -25,3 +26,21 @@ To use Spotify related commands, a Spotify API Client ID and Secret are required
 3. A client ID and Secret will be displayed. Note these down. (do not share your secret with anyone!)
 4. Inside the tokens folder, create a new .txt file called `spotify_id.txt`, and another .txt file called `spotify_secret.txt`.
 5. Place the respective item into each file with no other content.
+
+## Required Packages
+
+### Package List
+- `discord.py` - Discord functionality
+- `wikipedia` - Wikipedia command
+- `psutil` - Host Info command
+- `py-cpuinfo` - Host Info command
+- `spotipy` - Spotify commands
+
+### Pip Install Command
+To install all required packages using Pip, you can run the following command to retrieve the packages from PyPi:
+`pip install discord.py wikipedia psutil py-cpuinfo spotipy`
+
+## Adding a New Command
+If you would like to add a new command to your copy of RestartBot, you can use the following template:
+`@tree.command(name = "command-name", description = "Description of your command.")\
+todo

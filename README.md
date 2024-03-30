@@ -16,7 +16,7 @@ A Discord bot token is required to use this bot.
 1. Go to Discord Developer Portal.
 2. Make a new application.
 3. Under the Bot menu, make a new bot and copy the token.
-4. Inside the tokens folder, create a new .txt file called discord_token.txt.
+4. Inside the tokens folder, create a new `.txt` file called `discord_token.txt`.
 5. Generate a Discord Bot token, and place it in the text file with no other contents. (do not share your bot token with anyone!)
 
 ### Spotify Token
@@ -24,7 +24,7 @@ To use Spotify related commands, a Spotify API Client ID and Secret are required
 1. Go to Spotify Developers.
 2. Create a new application. Set the name and description to whatever you want, and set the fallback URI to a URL of your selection. `example.com` will work fine.
 3. A client ID and Secret will be displayed. Note these down. (do not share your secret with anyone!)
-4. Inside the tokens folder, create a new .txt file called `spotify_id.txt`, and another .txt file called `spotify_secret.txt`.
+4. Inside the tokens folder, create a new `.txt` file called `spotify_id.txt`, and another .txt file called `spotify_secret.txt`.
 5. Place the respective item into each file with no other content.
 
 ## Required Packages
@@ -41,6 +41,6 @@ To install all required packages using Pip, you can run the following command to
 `pip install discord.py wikipedia psutil py-cpuinfo spotipy`
 
 ## Adding a New Command
-If you would like to add a new command to your copy of RestartBot, you can use the following template:\
-`@tree.command(name = "command-name", description = "Description of your command.")\
-todo
+Please read examples.py to find code snippets that you can use as a reference to make your own command.\
+\
+It is also recommended to read the discord.py documentation and do your own reference to find out what is possible with Discord Slash Commands.

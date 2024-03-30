@@ -1457,7 +1457,7 @@ async def self(interaction: discord.Interaction, question: str):
     await interaction.edit_original_response(embed = embed)
 
 # First Message command
-@tree.command(name = "first-message", description = "Get the first message in a channel. Will use the current channel by default, however you can optionally select a specific channel.")
+@tree.command(name = "first-message", description = "Get the first message in a channel, uses current channel by default.")
 async def self(interaction: discord.Interaction, channel: discord.TextChannel = None):
     await interaction.response.defer(ephemeral=True)
     try:

@@ -1406,24 +1406,30 @@ async def self(interaction: discord.Interaction, query: str):
 @app_commands.checks.cooldown(1, 5)
 async def self(interaction: discord.Interaction, search: str):
     await interaction.response.defer()
+    embed = discord.Embed(title = "Loading...", color = Color.random())
+    await interaction.followup.send(embed = embed)
+    embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
     try:
         page = wikipedia.page(search)
         embed = discord.Embed(title = f"Search: {search}")
         embed.add_field(name = f"{page.title}", value = wikipedia.summary(search, sentences = 3))
-        embed.add_field(name = "Read More", value = page.url)
         embed.set_footer(text = "Wikipedia", icon_url = "https://upload.wikimedia.org/wikipedia/en/thumb/8/80/Wikipedia-logo-v2.svg/1200px-Wikipedia-logo-v2.svg.png")
-        await interaction.followup.send(embed = embed)
+        view = View()
+        view.add_item(discord.ui.Button(label = "Read More", style = discord.ButtonStyle.url, url = page.url))
+        await interaction.edit_original_response(embed = embed, view = view)
     except wikipedia.exceptions.PageError:
         embed = discord.Embed(title = "Error", description = f"No page was found on Wikipedia matching {search}. Try another search.", color = Color.red())
         embed.set_footer(text = "Wikipedia", icon_url = "https://upload.wikimedia.org/wikipedia/en/thumb/8/80/Wikipedia-logo-v2.svg/1200px-Wikipedia-logo-v2.svg.png")
-        await interaction.followup.send(embed = embed, ephemeral = True)
+        await interaction.edit_original_response(embed = embed)
     except wikipedia.exceptions.DisambiguationError as error:
         embed = discord.Embed(title = "Please be more specific with your query.", color = Color.red())
         embed.add_field(name = "Information", value = error)
         embed.set_footer(text = "Wikipedia", icon_url = "https://upload.wikimedia.org/wikipedia/en/thumb/8/80/Wikipedia-logo-v2.svg/1200px-Wikipedia-logo-v2.svg.png")
-        await interaction.followup.send(embed = embed, ephemeral = True)
-    except GuessedAtParserWarning:
-        pass
+        await interaction.edit_original_response(embed = embed)
+    except Exception:
+        embed = discord.Embed(title = "An error has occured.", description = "Please try again later or message <@563372552643149825> for assistance.", color = Color.red())
+        embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
+        await interaction.edit_original_response(embed = embed, view = None)
 
 # 8 Ball command
 @tree.command(name = "8ball", description = "Get an answer from the mystical 8 ball.")
@@ -1450,10 +1456,27 @@ async def self(interaction: discord.Interaction, question: str):
 
     await interaction.edit_original_response(embed = embed)
 
+# First Message command
+@tree.command(name = "first-message", description = "Get the first message in a channel. Will use the current channel by default, however you can optionally select a specific channel.")
+async def self(interaction: discord.Interaction, channel: discord.TextChannel = None):
+    await interaction.response.defer(ephemeral=True)
+    try:
+        if channel == None:
+            channel = interaction.channel
+        async for msg in channel.history(limit = 1, oldest_first = True):
+            embed = discord.Embed(title = f"#{channel.name} - First Message", description=f"{msg.content}", color = Color.random())
+            embed.set_footer(text = f"{msg.author.name} - {(msg.created_at).hour}:{(msg.created_at).minute} {(msg.created_at).day}/{(msg.created_at).month}/{(msg.created_at).year} UTC", icon_url = msg.author.avatar.url)
+            view = View()
+            view.add_item(discord.ui.Button(style = discord.ButtonStyle.url, url = msg.jump_url, label = "Jump to Message"))
+            await interaction.followup.send(ephemeral=True, embed=embed, view=view)
+    except Exception:
+        embed = discord.Embed(title = "Error", description = "**An error has occured.\n\nSolutions**\n- Is the channel a text channel?\n- Has a message been sent here yet?\n- Try again later.", color = Color.red())
+        interaction.followup.send(embed=embed, ephemeral=True)
+
 # Cooldown Handler
 @tree.error
 async def on_app_command_error(interaction: discord.Interaction, error: discord.app_commands.AppCommandError) -> None:
-    await interaction.response.defer()
+    await interaction.response.defer(ephemeral=True)
     if isinstance(error, app_commands.errors.CommandOnCooldown):
         embed = discord.Embed(title = "Cooldown", description = error, color = Color.red())
         msg = await interaction.followup.send(embed = embed, ephemeral = True)

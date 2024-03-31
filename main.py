@@ -1480,7 +1480,7 @@ async def self(interaction: discord.Interaction):
     await interaction.response.defer()
     embed = discord.Embed(title = "Fish!", color = Color.random())
     file = discord.File(f"{path}{pathtype}content{pathtype}video_file{pathtype}fish.mp4", filename = "fish.mp4")
-    embed.set_image("attachment://fish.mp4")
+    embed.set_image(url = "attachment://fish.mp4")
     embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
     await interaction.followup.send(file = file, embed = embed)
     

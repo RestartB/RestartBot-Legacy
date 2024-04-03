@@ -1357,6 +1357,7 @@ async def self(interaction: discord.Interaction, url: str):
             await interaction.edit_original_response(embed = embed, view = view)
     except Exception:
         embed = discord.Embed(title = "Unexpected Error", description = "Please try again later or message <@563372552643149825> for assistance.", color = Color.red())
+        await interaction.edit_original_response(embed = embed, view = None)
 
 # --- MISC COMMANDS ---
 

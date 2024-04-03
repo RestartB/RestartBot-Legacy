@@ -1312,7 +1312,8 @@ async def self(interaction: discord.Interaction, url: str):
     await interaction.followup.send(embed = embed)
     
     try:
-        request_url = f"https://api.song.link/v1-alpha.1/links?url={urllib.parse.quote(url, safe='()*!\'')}&userCountry=GB"
+        processed_source = urllib.parse.quote(url, safe='()*!\'')
+        request_url = f"https://api.song.link/v1-alpha.1/links?url={processed_source}&userCountry=GB"
         
         # Send request to song.link
         async with aiohttp.ClientSession() as session:

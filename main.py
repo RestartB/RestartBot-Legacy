@@ -1531,6 +1531,16 @@ async def self(interaction: discord.Interaction, channel: discord.TextChannel = 
         embed = discord.Embed(title = "Error", description = "**An error has occurred.\n\nSolutions**\n- Is the channel a text channel?\n- Has a message been sent here yet?\n- Try again later.", color = Color.red())
         interaction.followup.send(embed=embed, ephemeral=True)
 
+# Fish Command
+@tree.command(name = "fish", description = "Fish!")
+@app_commands.checks.cooldown(1,5)
+async def self(interaction: discord.Interaction):
+    await interaction.response.defer()
+    embed = discord.Embed(title = "Fish!", color = Color.random())
+    file = discord.File(f"{path}{pathtype}content{pathtype}video_file{pathtype}fish.mp4", filename = "fish.mp4")
+    embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
+    await interaction.followup.send(embed = embed, file = file)
+    
 # Cooldown Handler
 @tree.error
 async def on_app_command_error(interaction: discord.Interaction, error: discord.app_commands.AppCommandError) -> None:

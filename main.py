@@ -14,6 +14,7 @@ import datetime
 from datetime import timedelta
 import psutil
 import cpuinfo
+import urllib.parse
 
 # Imports - Wikipedia
 import wikipedia
@@ -590,7 +591,7 @@ async def self(interaction: discord.Interaction, search: str):
         search = search.lower()
 
         # Send initial embed
-        embed = discord.Embed(title = "Searching...")
+        embed = discord.Embed(title = "Searching...", color = Color.orange())
         embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
         await interaction.followup.send(embed = embed)
 
@@ -757,7 +758,7 @@ async def self(interaction: discord.Interaction, search_type: app_commands.Choic
             artist_string = ""
 
             # Send initial embed
-            embed = discord.Embed(title = "Searching...")
+            embed = discord.Embed(title = "Searching...", color = Color.orange())
             embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
             await interaction.followup.send(embed = embed)
 
@@ -987,7 +988,7 @@ async def self(interaction: discord.Interaction, search_type: app_commands.Choic
 async def self(interaction: discord.Interaction, url: str):
     await interaction.response.defer()
     
-    embed = discord.Embed(title = "Searching...")
+    embed = discord.Embed(title = "Searching...", color = Color.orange())
     embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
     await interaction.followup.send(embed = embed)
 
@@ -1250,7 +1251,7 @@ async def self(interaction: discord.Interaction, url: str):
 async def self(interaction: discord.Interaction, url: str):
     await interaction.response.defer()
     
-    embed = discord.Embed(title = "Searching...")
+    embed = discord.Embed(title = "Searching...", color = Color.orange())
     embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
     await interaction.followup.send(embed = embed)
 
@@ -1300,6 +1301,63 @@ async def self(interaction: discord.Interaction, url: str):
             embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
             await interaction.edit_original_response(embed = embed)
 
+# Global Song URL command
+@tree.command(name = "song-global-url", description = "Get links for many streaming platforms based on a URL.")
+@app_commands.checks.cooldown(1, 10)
+async def self(interaction: discord.Interaction, url: str):
+    await interaction.response.defer()
+
+    embed = discord.Embed(title = "Searching...", color = Color.orange())
+    embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
+    await interaction.followup.send(embed = embed)
+    
+    try:
+        request_url = f"https://api.song.link/v1-alpha.1/links?url={urllib.parse.quote(url, safe='()*!\'')}&userCountry=GB"
+        
+        # Send request to song.link
+        async with aiohttp.ClientSession() as session:
+            async with session.get(request_url) as request:
+                request_data = await request.json()
+                request_status = request.status
+        
+        if not(request_status <= 200 or request_status >= 299):
+            embed = discord.Embed(title = "An error has occurred.", description = "An error has occurred while finding song URLs.\n\n**Solutions:**\n1. Check the URL is a valid song URL.\n2. Check the URL is not for a playlist, album or artist.\n3. Try again later.", color = Color.red())
+            if interaction.user.id == restart_id:
+                embed.add_field(name = "Error Code (Dev)", value = request_status)
+            embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
+            await interaction.edit_original_response(embed = embed)
+        else:
+            embed = discord.Embed(title = f"{request_data['entitiesByUniqueId'][request_data['entityUniqueId']]['title']} ({request_data['entitiesByUniqueId'][request_data['entityUniqueId']]['type']})", color = Color.random())
+            embed.add_field(name = "Artists", value = request_data['entitiesByUniqueId'][request_data['entityUniqueId']]['artistName'])
+            if request_data['entitiesByUniqueId'][request_data['entityUniqueId']]['thumbnailUrl'] != None:
+                embed.set_thumbnail(url = request_data['entitiesByUniqueId'][request_data['entityUniqueId']]['thumbnailUrl'])
+            
+            view = View()
+
+            for link_type in request_data['linksByPlatform']:
+                if link_type == "amazonMusic":
+                    amazon_button = discord.ui.Button(style = discord.ButtonStyle.url, url = request_data['linksByPlatform'][link_type]['url'], label = "Amazon Music", row = 0)
+                    view.add_item(amazon_button)
+                elif link_type == "appleMusic":
+                    am_button = discord.ui.Button(style = discord.ButtonStyle.url, url = request_data['linksByPlatform'][link_type]['url'], label = "Apple Music", row = 0)
+                    view.add_item(am_button)
+                elif link_type == "spotify":
+                    spotify_button = discord.ui.Button(style = discord.ButtonStyle.url, url = request_data['linksByPlatform'][link_type]['url'], label = "Spotify", row = 0)
+                    view.add_item(spotify_button)
+                elif link_type == "tidal":
+                    tidal_button = discord.ui.Button(style = discord.ButtonStyle.url, url = request_data['linksByPlatform'][link_type]['url'], label = "Tidal", row = 0)
+                    view.add_item(tidal_button)
+                elif link_type == "youtube":
+                    yt_button = discord.ui.Button(style = discord.ButtonStyle.url, url = request_data['linksByPlatform'][link_type]['url'], label = "YouTube", row = 1)
+                    view.add_item(yt_button)
+                elif link_type == "youtubeMusic":
+                    ytm_button = discord.ui.Button(style = discord.ButtonStyle.url, url = request_data['linksByPlatform'][link_type]['url'], label = "YouTube Music", row = 1)
+                    view.add_item(ytm_button)
+
+            await interaction.edit_original_response(embed = embed, view = view)
+    except Exception:
+        embed = discord.Embed(title = "Unexpected Error", description = "Please try again later or message <@563372552643149825> for assistance.", color = Color.red())
+
 # --- MISC COMMANDS ---
 
 # Equation Solver command (broken)
@@ -1323,7 +1381,7 @@ async def self(interaction: discord.Interaction, url: str):
 #         # Edit loading message with new embed
 #         await interaction.edit_original_response(embed = embed)
 #     except Exception:
-#         embed = discord.Embed(title = "Error", description = "An error has occured. Solutions:\n\n**1.** Is the expression / equation valid?\n**2.** Are you using any forbidden characters?\n**3.** Try again later.")
+#         embed = discord.Embed(title = "Error", description = "An error has occurred. Solutions:\n\n**1.** Is the expression / equation valid?\n**2.** Are you using any forbidden characters?\n**3.** Try again later.")
 #         embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
 #         await interaction.edit_original_response(embed = embed)
 
@@ -1333,7 +1391,7 @@ async def self(interaction: discord.Interaction, url: str):
 async def self(interaction: discord.Interaction, query: str):
     await interaction.response.defer()
 
-    embed = discord.Embed(title = "Searching...")
+    embed = discord.Embed(title = "Searching...", color = Color.orange())
     embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
     await interaction.followup.send(embed = embed)
 
@@ -1397,7 +1455,7 @@ async def self(interaction: discord.Interaction, query: str):
             embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
             await interaction.edit_original_response(embed = embed)
     except Exception:
-        embed = discord.Embed(title = "An error has occured.", description = "Please try again later or message <@563372552643149825> for assistance.", color = Color.red())
+        embed = discord.Embed(title = "An error has occurred.", description = "Please try again later or message <@563372552643149825> for assistance.", color = Color.red())
         embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
         await interaction.edit_original_response(embed = embed, view = None)
 
@@ -1406,7 +1464,7 @@ async def self(interaction: discord.Interaction, query: str):
 @app_commands.checks.cooldown(1, 5)
 async def self(interaction: discord.Interaction, search: str):
     await interaction.response.defer()
-    embed = discord.Embed(title = "Loading...", color = Color.random())
+    embed = discord.Embed(title = "Loading...", color = Color.orange())
     await interaction.followup.send(embed = embed)
     embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
     try:
@@ -1427,7 +1485,7 @@ async def self(interaction: discord.Interaction, search: str):
         embed.set_footer(text = "Wikipedia", icon_url = "https://upload.wikimedia.org/wikipedia/en/thumb/8/80/Wikipedia-logo-v2.svg/1200px-Wikipedia-logo-v2.svg.png")
         await interaction.edit_original_response(embed = embed)
     except Exception:
-        embed = discord.Embed(title = "An error has occured.", description = "Please try again later or message <@563372552643149825> for assistance.", color = Color.red())
+        embed = discord.Embed(title = "An error has occurred.", description = "Please try again later or message <@563372552643149825> for assistance.", color = Color.red())
         embed.set_footer(text = f"Requested by {interaction.user.name}", icon_url = interaction.user.avatar.url)
         await interaction.edit_original_response(embed = embed, view = None)
 
@@ -1470,7 +1528,7 @@ async def self(interaction: discord.Interaction, channel: discord.TextChannel = 
             view.add_item(discord.ui.Button(style = discord.ButtonStyle.url, url = msg.jump_url, label = "Jump to Message"))
             await interaction.followup.send(ephemeral=True, embed=embed, view=view)
     except Exception:
-        embed = discord.Embed(title = "Error", description = "**An error has occured.\n\nSolutions**\n- Is the channel a text channel?\n- Has a message been sent here yet?\n- Try again later.", color = Color.red())
+        embed = discord.Embed(title = "Error", description = "**An error has occurred.\n\nSolutions**\n- Is the channel a text channel?\n- Has a message been sent here yet?\n- Try again later.", color = Color.red())
         interaction.followup.send(embed=embed, ephemeral=True)
 
 # Cooldown Handler

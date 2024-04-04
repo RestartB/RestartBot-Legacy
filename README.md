@@ -1,6 +1,9 @@
 # RestartBot
 Discord Bot by Restart.
 
+## Rewrite
+RestartBot will (hopefully) be rewritten to use cogs soon, making the bot significantly easier to maintain and add commands to. Await further updates! 👀
+
 ## Commands
 Coming soon!
 

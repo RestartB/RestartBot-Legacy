@@ -1,8 +1,10 @@
-# RestartBot
-Discord Bot by Restart.
+# RestartBot Legacy
+Legacy version of RestartBot by RestartBot.
 
-## Rewrite
-RestartBot will (hopefully) be rewritten to use cogs soon, making the bot significantly easier to maintain and add commands to. Await further updates! 👀
+## Legacy Notice
+> [!IMPORTANT]
+> This version of RestartBot is now considered legacy and deprecated. The modern version can now be found at:\
+https://github.com/restartb/restartbot
 
 ## Commands
 Coming soon!

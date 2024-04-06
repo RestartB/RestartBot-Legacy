@@ -1,5 +1,5 @@
 # RestartBot Legacy
-Legacy version of RestartBot by RestartBot.
+Legacy version of RestartBot by Restart.
 
 ## Notice
 > [!IMPORTANT]

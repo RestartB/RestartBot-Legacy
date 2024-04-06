@@ -1,7 +1,7 @@
 # RestartBot Legacy
 Legacy version of RestartBot by RestartBot.
 
-## Legacy Notice
+## Notice
 > [!IMPORTANT]
 > This version of RestartBot is now considered legacy and deprecated. The modern version can now be found at:\
 https://github.com/restartb/restartbot
